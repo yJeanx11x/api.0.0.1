@@ -1,24 +1,21 @@
-import http from 'node:http'
-import { buffer } from 'node:stream/consumers'
+import http from "node:http" // jeito moderno para importa
+import {jsonBodyHandler} from "./middlewares/jsonBodyHandler.js"
 
-const server = http.createServer(async(req, res) => {
+const server=http.createServer(async(req,res)=>{
 
-    const { method, url } = req
+const {method,url}=req
 
-    if (method === "GET" && url === '/products') {
-        return res.end('Lista De Produtos!')
-    }
-    else if (method === "POST" && url === '/products') {
+await jsonBodyHandler(req,res)
 
-        const buffers= []
+if (method === "GET" && url === "/products"){   
+return res.end("Lista De Produtos")
+}
 
-        for await(const chunk of req){
-            buffers.push(chunk)
-        }
-        console.log(Buffer.concat(buffers).toString())
+if (method === "POST" && url === "/products"){   
+    console.log(req.body)
+return res.writeHead(201).end(JSON.stringify(req.body))
+}
 
-    }
-
-    return res.writeHead(404).end('Rota não encontrada!')
 })
+
 server.listen(3333)
